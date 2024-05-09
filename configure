@@ -551,7 +551,7 @@ function menu_splitlist() {
 	# Show selection dialog
 	dialog \
 		--title "$title" \
-		--buildlist "$description\nUse ^ to focus the list of unselected items and $ to focus the list of selected items. Use <Space> to select/deselect an item and select <OK> by pressing <Enter> when finished." \
+		--buildlist "$description\nUse ^ to focus the list of unselected items and $ to focus the list of selected items. Use <Space Bar> to select/deselect an item and select <OK> by pressing <Enter> when finished." \
 		"${BUILDLIST_SIZE[@]}" "${items[@]}"
 
 	local diag_exit=$?
@@ -654,7 +654,7 @@ function menu_radiolist() {
 		--help-button \
 		--help-label "Select" \
 		--help-status \
-		--ok-label "OK" \
+		--ok-label "Okay" \
 		--default-item "$default_item" \
 		--default-button help \
 		--radiolist "$description\nUse <Select> to select the option under the cursor, or <OK> to use the option which is selected with an asterisk." \
@@ -733,9 +733,9 @@ function msgbox_help() {
 function menu_exit() {
 	if [[ $UNSAVED_CHANGES == "true" ]]; then
 		dialog \
-			--help-button --help-label "Back" \
+			--help-button --help-label "Go Back" \
 			--yes-label "Save" --no-label "Discard" \
-			--yesno "Do you want to save your configuration?\n(Press <ESC><ESC>, or choose <Back> to continue gentoo configuration)." \
+			--yesno "Save config?\n(Press <ESC><ESC>, or choose <Back> to continue gentoo configuration)." \
 			"${CONFIRM_SIZE[@]}"
 
 		local diag_exit="$?"
@@ -758,7 +758,7 @@ function menu_exit() {
 
 function menu_save_as() {
 	dialog \
-		--ok-label "Save" \
+		--ok-label "Save settings" \
 		--inputbox "Enter a filename to which this configuration should be saved.\n(Press <ESC><ESC>, or choose <Cancel> to abort)." \
 		"${INPUTBOX_SIZE[@]}" "$SAVE_AS_FILENAME"
 
@@ -995,7 +995,7 @@ function PARTITIONING_SWAP_show()  { [[ $PARTITIONING_SCHEME != "custom" ]] && i
 function PARTITIONING_SWAP_help()  { echo "Select the amount of swap to use."; }
 function PARTITIONING_SWAP_menu()  {
 	dialog \
-		--title "Select swap amount" \
+		--title "Enter swap storage" \
 		--inputbox "Enter the amount of swap for the new system. Use the correct suffix (e.g. 16GiB, 1000MB)." \
 		"${INPUTBOX_SIZE[@]}" "$PARTITIONING_SWAP" \
 		|| return 0
@@ -1151,7 +1151,7 @@ function PARTITIONING_DEVICE_show()  { [[ $PARTITIONING_SCHEME != "custom" ]] &&
 function PARTITIONING_DEVICE_help()  { echo "The block device to which the layout will be applied."; }
 function PARTITIONING_DEVICE_menu()  {
 	if menu_select_device \
-		"Select root device" \
+		"Root Device" \
 		"Select the device to use as the root device." \
 		"$PARTITIONING_DEVICE"
 	then
@@ -1210,7 +1210,7 @@ function HOSTNAME_show()  { return 0; }
 function HOSTNAME_help()  { echo "Enter the desired system hostname here. Be aware that when creating mdadm raid arrays, this value will be recorded in metadata block. If you change it later, you should also update the metadata."; }
 function HOSTNAME_menu()  {
 	dialog \
-		--title "Select hostname" \
+		--title "Hostname" \
 		--inputbox "Enter the hostname for your new system." \
 		"${INPUTBOX_SIZE[@]}" "$HOSTNAME" \
 		|| return 0
@@ -1224,7 +1224,7 @@ function TIMEZONE_show()  { return 0; }
 function TIMEZONE_help()  { echo "The timezone for the new system."; }
 function TIMEZONE_menu()  {
 	if menu_radiolist \
-		"Select timezone" \
+		"Timezone Settings" \
 		"Select which timezone to use." \
 		"$TIMEZONE" \
 		"${ALL_TIMEZONES[@]}"
@@ -1286,12 +1286,12 @@ function KEYMAP_INITRAMFS_menu()  {
 	fi
 }
 
-function LOCALES_tag()   { echo "Locales"; }
+function LOCALES_tag()   { echo "Language"; }
 function LOCALES_label() { echo "$N_LOCALES selected"; }
 function LOCALES_show()  { return 0; }
 function LOCALES_help()  { echo "The locales to generate for the new system. Be careful that the syntax for locales is a different from the resulting name of the generated locales of locale-gen. For example, the locale 'en_US.utf8' is enabled via 'en_US.UTF-8 UTF-8')."; }
 function LOCALES_menu()  {
-	if menu_splitlist "Select locales" "Select which locales to generate." "$SELECTED_LOCALES" "${SUPPORTED_LOCALES[@]}"; then
+	if menu_splitlist "Language" "Select your language" "$SELECTED_LOCALES" "${SUPPORTED_LOCALES[@]}"; then
 		SELECTED_LOCALES="$dialog_out"
 		recalculate_locales
 		UNSAVED_CHANGES=true
@@ -1301,13 +1301,13 @@ function LOCALES_menu()  {
 	fi
 }
 
-function LOCALE_tag()   { echo "Default locale"; }
+function LOCALE_tag()   { echo "System Language"; }
 function LOCALE_label() { echo "($LOCALE)"; }
 function LOCALE_show()  { return 0; }
 function LOCALE_help()  { echo "The locale to use for the new system. See \`locale -a\` for available options, and be sure to generate the locale by adding it to the list of locales above."; }
 function LOCALE_menu()  {
 	if menu_radiolist \
-		"Select default locale" \
+		"System Language" \
 		"Select which locale to use as the default. Remember to also add the desired locale to the list of locales above." \
 		"$LOCALE" \
 		"${LOCALE_A[@]}"
@@ -1428,7 +1428,7 @@ function PORTAGE_SYNC_TYPE_menu()  {
 	fi
 }
 
-function PORTAGE_GIT_FULL_HISTORY_tag()   { echo " ├ Download full history"; }
+function PORTAGE_GIT_FULL_HISTORY_tag()   { echo " ├ Get Full History"; }
 function PORTAGE_GIT_FULL_HISTORY_label() { on_off_label "$PORTAGE_GIT_FULL_HISTORY" " ├ "; }
 function PORTAGE_GIT_FULL_HISTORY_show()  { one_of "$PORTAGE_SYNC_TYPE" "git"; }
 function PORTAGE_GIT_FULL_HISTORY_help()  { echo "Determines if the full git history of the portage tree will be downloaded. This can easily take up 1-2GB of disk space."; }
@@ -1443,7 +1443,7 @@ function PORTAGE_GIT_MIRROR_show()  { one_of "$PORTAGE_SYNC_TYPE" "git"; }
 function PORTAGE_GIT_MIRROR_help()  { echo "The portage git mirror is the git endpoint that is used to sync the portage tree. You usually should not need to change this!"; }
 function PORTAGE_GIT_MIRROR_menu()  {
 	dialog \
-		--title "Select portage git mirror" \
+		--title "Mirror Settings" \
 		--inputbox "Enter the portage git mirror that should be used to sync the portage tree." \
 		"${INPUTBOX_SIZE[@]}" "$PORTAGE_GIT_MIRROR" \
 		|| return 0
@@ -1451,13 +1451,13 @@ function PORTAGE_GIT_MIRROR_menu()  {
 	UNSAVED_CHANGES=true
 }
 
-function GENTOO_MIRROR_tag()   { echo "Gentoo mirror"; }
+function GENTOO_MIRROR_tag()   { echo "Gentoo Mirror"; }
 function GENTOO_MIRROR_label() { echo "($(ellipsis 20 "$GENTOO_MIRROR"))"; }
 function GENTOO_MIRROR_show()  { return 0; }
 function GENTOO_MIRROR_help()  { echo "Enter the initial gentoo mirror that should be used for the installation process (until mirrorselect is run)."; }
 function GENTOO_MIRROR_menu()  {
 	dialog \
-		--title "Select gentoo mirror" \
+		--title "Gentoo Mirror Settings" \
 		--inputbox "Enter the initial gentoo mirror that should be used for the system (or until mirrorselect is run). You need to enter the FULL PATH to the tree including relevant subdirectories. Leave this as it is if in doubt!" \
 		"${INPUTBOX_SIZE[@]}" "$GENTOO_MIRROR" \
 		|| return 0
@@ -1465,7 +1465,7 @@ function GENTOO_MIRROR_menu()  {
 	UNSAVED_CHANGES=true
 }
 
-function GENTOO_ARCH_tag()   { echo "Gentoo arch"; }
+function GENTOO_ARCH_tag()   { echo "Arch Settings"; }
 function GENTOO_ARCH_label() { echo "($GENTOO_ARCH)"; }
 function GENTOO_ARCH_show()  { return 0; }
 function GENTOO_ARCH_help()  { echo "Select gentoo's architecture tag for the new system."; }
@@ -1563,7 +1563,7 @@ function ADDITIONAL_PACKAGES_show()  { return 0; }
 function ADDITIONAL_PACKAGES_help()  { echo "Enter additional packages that should be installed. It is recommended to keep this to a minimum, because of the quite \"interactive\" nature of gentoo package management ;)"; }
 function ADDITIONAL_PACKAGES_menu()  {
 	dialog \
-		--title "Additional packages" \
+		--title "More Packages" \
 		--inputbox "Enter additional packages (portage package ATOMs) to install. Delimited by space." \
 		"${INPUTBOX_SIZE[@]}" "${ADDITIONAL_PACKAGES[*]}"
 	# shellcheck disable=SC2206
